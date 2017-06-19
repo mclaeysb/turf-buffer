@@ -25,3 +25,10 @@ build/Release
 node_modules
 
 .DS_Store
+
+# Output of tests
+test/fixtures/out
+
+# Extra tests
+test/test-extra.js
+test/fixtures-extra

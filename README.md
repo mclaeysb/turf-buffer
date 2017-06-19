@@ -1,9 +1,11 @@
-# turf-buffer
+turf-buffer
+===========
 
-[![build status](https://secure.travis-ci.org/Turfjs/turf-buffer.png)](http://travis-ci.org/Turfjs/turf-buffer)
+Branched from the old [`turf-buffer`](https://github.com/Turfjs/turf-buffer/) (now at [`@turf/buffer`](https://github.com/Turfjs/turf/tree/master/packages/turf-buffer)). Implements a geodesic buffer, as explained in [this](https://github.com/Turfjs/turf-buffer/pull/33) PR.
 
 turf buffer module
 
+This code is not on `npm`. Therefore, you'll have to download this directory, name it `turf-buffer` and put it in the `node_modules` directory of you projected.
 
 ### `turf.buffer(feature, distance, unit)`
 
@@ -39,20 +41,11 @@ var result = turf.featurecollection([buffered, pt]);
 ```
 
 
-**Returns** `FeatureCollection.<Polygon>,FeatureCollection.<MultiPolygon>,Polygon,MultiPolygon`, buffered features 
+```js
+var buffer = require('turf-buffer')
 
-## Installation
+// pt = geojson point
 
-Requires [nodejs](http://nodejs.org/).
+var buffered = buffer(pt, 10, 'miles')
 
-```sh
-$ npm install turf-buffer
-```
-
-## Tests
-
-```sh
-$ npm test
-```
-
-
+``` 

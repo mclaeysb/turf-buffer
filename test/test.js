@@ -1,55 +1,54 @@
 var test = require('tape');
 var buffer = require('../');
 var fs = require('fs');
-var glob = require('glob');
-var featurecollection = require('turf-featurecollection');
-var extent = require('turf-extent');
-var point = require('turf-point');
-var distance = require('turf-distance');
-var normalize = require('geojson-normalize');
+var helpers = require('turf-helpers')
 
 test('buffer', function(t){
-  var fixtures = glob.sync(__dirname+'/fixtures/in/*.geojson');
-  fixtures.forEach(function(path){
-    var fixture = JSON.parse(fs.readFileSync(path));
-    var bbox = extent(fixture);
-    var width = distance(
-      point(bbox.slice(0,2)),
-      point(bbox.slice(2,5)),
-      'miles'
-      );
-    if(!width) width = 1;
-    var buffed = buffer(fixture, width * 0.1, 'miles');
+  var point = JSON.parse(fs.readFileSync(__dirname+'/fixtures/Point.geojson'));
+  var multiPoint = JSON.parse(fs.readFileSync(__dirname+'/fixtures/MultiPoint.geojson'));
+  var lineString = JSON.parse(fs.readFileSync(__dirname+'/fixtures/LineString.geojson'));
+  var multiLineString = JSON.parse(fs.readFileSync(__dirname+'/fixtures/MultiLineString.geojson'));
+  var polygon = JSON.parse(fs.readFileSync(__dirname+'/fixtures/Polygon.geojson'));
+  var multiPolygon = JSON.parse(fs.readFileSync(__dirname+'/fixtures/MultiPolygon.geojson'));
 
-    t.ok(buffed, fixture.type);
-    if(fixture.type === 'Feature') {
-      if(fixture.geometry.type === 'Point') t.equals(buffed.geometry.type, 'Polygon');
-      if(fixture.geometry.type === 'LineString') t.equals(buffed.geometry.type, 'Polygon');
-      if(fixture.geometry.type === 'Polygon') t.equals(buffed.geometry.type, 'Polygon');
-      if(fixture.geometry.type === 'MultiPoint') t.equals(buffed.geometry.type, 'MultiPolygon');
-      if(fixture.geometry.type === 'MultiLineString') t.equals(buffed.geometry.type, 'MultiPolygon');
-      if(fixture.geometry.type === 'MultiPolygon') t.equals(buffed.geometry.type, 'MultiPolygon');
-      if(fixture.geometry.type === 'GeometryCollection') t.equals(buffed.geometry.type, 'MultiPolygon');
-    } else {
-      t.equals(fixture.type, buffed.type);
-      t.equals(buffed.type, 'FeatureCollection');
-    }
+  // Tests for basic features
+  var bufferedPoint = buffer(point, 1, 'kilometers', 100);
+  fs.writeFileSync(__dirname+'/fixtures/out/Point.geojson', JSON.stringify(helpers.featureCollection([bufferedPoint, point])));
 
-    buffed = normalize(buffed);
-    buffed.features = buffed.features.map(function(f) {
-      f.properties = {
-        'fill': '#000',
-        'fill-opacity': 0.3,
-        'stroke': '#0ff'
-      };
-      return f;
-    });
- 
-    buffed.features = buffed.features.concat(normalize(fixture).features);
-    fs.writeFileSync(
-        __dirname+'/fixtures/out/'+path.split('/')[path.split('/').length-1],
-        JSON.stringify(buffed)
-      );
-  });
+  var bufferedMultiPoint = buffer(multiPoint, 1, 'kilometers');
+  bufferedMultiPoint.features.push(multiPoint)
+  fs.writeFileSync(__dirname+'/fixtures/out/MultiPoint.geojson', JSON.stringify(bufferedMultiPoint));
+
+  var bufferedLineString = buffer(lineString, 1, 'kilometers');
+  fs.writeFileSync(__dirname+'/fixtures/out/LineString.geojson', JSON.stringify(helpers.featureCollection([bufferedLineString, lineString])));
+
+  var bufferedMultiLineString = buffer(multiLineString, 1, 'kilometers');
+  bufferedMultiLineString.features.push(multiLineString)
+  fs.writeFileSync(__dirname+'/fixtures/out/MultiLineString.geojson', JSON.stringify(bufferedMultiLineString));
+
+  var bufferedPolygon = buffer(polygon, 1, 'kilometers');
+  fs.writeFileSync(__dirname+'/fixtures/out/Polygon.geojson', JSON.stringify(helpers.featureCollection([bufferedPolygon, polygon])));
+
+  var bufferedMultiPolygon = buffer(multiPolygon, 0.2, 'kilometers');
+  bufferedMultiPolygon.features.push(multiPolygon)
+  fs.writeFileSync(__dirname+'/fixtures/out/MultiPolygon.geojson', JSON.stringify(bufferedMultiPolygon));
+
+  // Test to buffer a circle LineString with buffer radius = circle radius
+  var disk = buffer(point, 1, 'kilometers');
+  var circle = disk;
+  circle.geometry.type = "LineString";
+  circle.geometry.coordinates = circle.geometry.coordinates[0];
+  var bufferedCircle = buffer(circle, 1, 'kilometers');
+  fs.writeFileSync(__dirname+'/fixtures/out/Circle.geojson', JSON.stringify(helpers.featureCollection([bufferedCircle, circle])));
+  // the simplepolygon output has 32 rings, each with winding > 0
+
+  t.ok(bufferedPoint, 'should buffer a Point');
+  t.ok(bufferedMultiPoint, 'should buffer a MultiPoint');
+  t.ok(bufferedLineString, 'should buffer a LineString');
+  t.ok(bufferedMultiLineString, 'should buffer a MultiLineString');
+  t.ok(bufferedPolygon, 'should buffer a Polygon');
+  t.ok(bufferedMultiPolygon, 'should buffer a multiPolygon');
+  t.ok(bufferedMultiPolygon, 'should buffer a circle with buffer radius = circle radius, without creating a hole or error in the middle');
+
   t.end();
 });

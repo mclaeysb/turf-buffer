@@ -1,15 +1,14 @@
 {
   "name": "turf-buffer",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "description": "turf buffer module",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test/test.js",
-    "doc": "dox -r < index.js | doxme --readme > README.md"
+    "test": "tape test/test.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Turfjs/turf-buffer.git"
+    "url": "https://github.com/mclaeysb/turf-buffer.git"
   },
   "keywords": [
     "buffer",
@@ -20,27 +19,24 @@
     "geojson",
     "turf"
   ],
-  "author": "morganherlocker",
+  "author": "Manuel Claeys Bouuaert",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Turfjs/turf-buffer/issues"
+    "url": "https://github.com/mclaeysb/turf-buffer/issues"
   },
-  "homepage": "https://github.com/Turfjs/turf-buffer",
+  "homepage": "https://github.com/mclaeysb/turf-buffer",
   "devDependencies": {
-    "benchmark": "^1.0.0",
-    "dox": "^0.7.0",
-    "doxme": "^1.8.2",
-    "glob": "^5.0.3",
-    "tape": "^3.5.0",
-    "turf-distance": "^1.0.1",
-    "turf-extent": "^1.0.4",
-    "turf-point": "^2.0.1"
+    "benchmark": "^2.1.1",
+    "tape": "^2.13.3",
+    "turf-buffer": "^3.0.12"
   },
   "dependencies": {
-    "geojson-normalize": "0.0.0",
-    "jsts": "^0.15.0",
-    "turf-combine": "^1.0.2",
-    "turf-featurecollection": "^1.0.1",
-    "turf-polygon": "^1.0.3"
+    "simplepolygon": "^1.0.0",
+    "turf-destination": "^3.0.0",
+    "turf-bearing": "^3.0.0",
+    "turf-helpers": "^3.0.0",
+    "turf-union": "^3.0.0",
+    "turf-difference": "^3.0.0",
+    "turf-simplify": "^3.0.0"
   }
 }
